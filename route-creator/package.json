@@ -1,0 +1,32 @@
+{
+  "name": "route-creator-arsalan",
+  "version": "1.0.0",
+  "description": "Router Creator using cli command like Laravel Framework",
+  "main": "index.js",
+  "bin": {
+    "create-route": "./bin/create-route.js"
+  },
+  "scripts": {
+    "start": "node ./bin/create-route.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Arsalan-Ahmed-Solangi/express-packages.git"
+  },
+  "keywords": [
+    "route",
+    "node",
+    "express-setup",
+    "app",
+    "route"
+  ],
+  "author": "Arsalan Ahmed",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Arsalan-Ahmed-Solangi/express-packages/issues"
+  },
+  "homepage": "https://github.com/Arsalan-Ahmed-Solangi/express-packages#readme",
+  "dependencies": {
+    "express": "^4.21.1"
+  }
+}
