@@ -1,49 +1,106 @@
 #!/usr/bin/env node
 
-const fs = require("fs");
-const path = require("path");
+//**** Importing Packages ****//
+import fs from "fs";
+import path from "path";
 
-// Function to create the route file
-const createRoute = (routeName) => {
+//****** Create File Function ******//
+const createFile = (routeName, extension = "js") => {
   const routeFolder = path.join(process.cwd(), "routes");
-  const filePath = path.join(routeFolder, `${routeName}.js`);
+  const filePath = path.join(routeFolder, `${routeName}.${extension}`);
 
-  // Create routes folder if it doesn't exist
+  //****** Check if Routes Folder Exists ******//
   if (!fs.existsSync(routeFolder)) {
     fs.mkdirSync(routeFolder);
     console.log(`Created folder: ${routeFolder}`);
   }
 
-  // Content for the new route file
+  //****** Create Route File Content ******//
   const routeContent = `
-const express = require('express');
+import express from 'express';
 const router = express.Router();
 
-// Define your route logic here
+//**** GET Route ****//
 router.get('/', (req, res) => {
-  res.send('${routeName} route is working!');
+  return res.send('${routeName} route is working!');
 });
 
-module.exports = router;
-  `;
+//**** GET Route with ID ****//
+router.get('/:id', (req, res) => {
+  const { id } = req.params;
+  return res.send(\`${routeName} route with ID: \${id} is working!\`);
+});
 
-  // Check if the route file already exists
+//**** POST Route ****//
+router.post('/store', (req, res) => {
+  const body = req.body;
+  return res.json({ message: '${routeName} route is working!', data: body });
+});
+
+//**** PUT Route ****//
+router.put('/update/:id', (req, res) => {
+  const { id } = req.params;
+  const body = req.body;
+  return res.json({ message: '${routeName} route updated successfully!', id, data: body });
+});
+
+//**** DELETE Route ****//
+router.delete('/delete/:id', (req, res) => {
+  const { id } = req.params;
+  return res.json({ message: '${routeName} route deleted successfully!', id });
+});
+
+export default router;
+  `.trim();
+
+  //****** Check if File Already Exists ******//
   if (fs.existsSync(filePath)) {
-    console.log(`Route file ${routeName}.js already exists.`);
+    console.error(
+      `Error: Route file '${routeName}.${extension}' already exists.`
+    );
     return;
   }
 
-  // Create the route file with content
-  fs.writeFileSync(filePath, routeContent.trim());
-  console.log(`Created route file: ${filePath}`);
+  //****** Create Route File ******//
+  try {
+    fs.writeFileSync(filePath, routeContent);
+    console.log(`Successfully created route file: ${filePath}`);
+  } catch (error) {
+    console.error(`Error creating route file: ${error.message}`);
+  }
 };
 
-// Get the route name from the command arguments
+//****** Get Arguments from Command Line ******//
 const args = process.argv.slice(2);
 if (args.length === 0) {
-  console.log("Please provide a route name.");
+  console.error("Error: Please provide a route name.");
   process.exit(1);
 }
 
 const routeName = args[0];
-createRoute(routeName);
+let extension = "js";
+
+//*****OptionalExtension*******//
+if (args[1]) {
+  const validExtensions = ["js","ts","mjs"];
+  if (validExtensions.includes(args[1])) {
+    extension = args[1];
+  } else {
+    console.error(
+      `Error: Invalid extension '${
+        args[1]
+      }'. Valid extensions are: ${validExtensions.join(", ")}`
+    );
+    process.exit(1);
+  }
+}
+
+//*****ValideRouteName*******//
+if (!/^[\w-]+$/.test(routeName)) {
+  console.error(
+    "Error: Route name can only contain alphanumeric characters, underscores, or hyphens."
+  );
+  process.exit(1);
+}
+
+createFile(routeName, extension);
